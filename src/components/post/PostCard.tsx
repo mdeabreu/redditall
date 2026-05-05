@@ -1,5 +1,6 @@
 import type { RedditPostCardData } from "../feed/types";
 import { Icon } from "../ui/Icon";
+import { PostFlair } from "./PostFlair";
 import { PostMeta } from "./PostMeta";
 import { PostTypeBadge } from "./PostTypeBadge";
 import { inferPostKind } from "./postUtils";
@@ -86,7 +87,7 @@ export function PostCard({
           </>
         )}
 
-        {post.flair ? <span className="ar-flair">{post.flair}</span> : null}
+        <PostFlair post={post} />
         <PostMeta post={post} />
       </div>
     </article>

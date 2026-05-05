@@ -2679,13 +2679,36 @@ button {
 }
 
 .ar-flair {
-  width: max-content;
+  width: fit-content;
   max-width: 100%;
-  padding: 3px 8px;
+  min-height: 24px;
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 3px 9px;
   border-radius: 999px;
   background: var(--surface-3);
   color: var(--text-3);
   font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.ar-flair-custom {
+  background: var(--flair-bg);
+  color: var(--flair-fg);
+  box-shadow: none;
+}
+
+.ar-flair-emoji {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .ar-post-meta {

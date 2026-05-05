@@ -16,6 +16,7 @@ export {
 } from "./reddit/normalize";
 export type {
   FeedPost,
+  RedditFlairPart,
   RedditListing,
   RedditListingRequest,
   RedditMediaKind,

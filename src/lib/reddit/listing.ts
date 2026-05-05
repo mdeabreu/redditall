@@ -1,4 +1,5 @@
 import { DEFAULT_LINK_THUMBNAIL, REDDIT_ORIGIN } from "./constants";
+import { getLinkFlairColor, getLinkFlairParts, getLinkFlairText } from "./flair";
 import { asBoolean, asNumber, asString, asStringOrNull, isRecord } from "./guards";
 import {
   getAnimatedImageUrl,
@@ -59,6 +60,8 @@ export function normalizeRedditPost(child: unknown): RedditPost | null {
   const isNsfw = asBoolean(data.over_18);
   const isSpoiler = asBoolean(data.spoiler);
   const selftext = asString(data.selftext) || "";
+  const flairRichtext = getLinkFlairParts(data);
+  const flair = getLinkFlairText(data, flairRichtext);
 
   if (!id || !asString(data.title)) {
     return null;
@@ -98,7 +101,11 @@ export function normalizeRedditPost(child: unknown): RedditPost | null {
     videoWidth: videoMedia.width,
     videoHeight: videoMedia.height,
     mediaKind,
-    flair: asString(data.link_flair_text),
+    flair,
+    flairType: asString(data.link_flair_type),
+    flairRichtext,
+    flairBackgroundColor: getLinkFlairColor(data.link_flair_background_color),
+    flairTextColor: asString(data.link_flair_text_color),
     isSelf,
     isNsfw,
     nsfw: isNsfw,

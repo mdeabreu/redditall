@@ -6,6 +6,17 @@ export type RedditTimeRange = (typeof REDDIT_TIME_RANGES)[number];
 
 export type RedditMediaKind = "image" | "video" | "gif" | "link" | "text" | "gallery";
 
+export type RedditFlairPart =
+  | {
+      type: "text";
+      text: string;
+    }
+  | {
+      type: "emoji";
+      alt: string;
+      url: string | null;
+    };
+
 export type RedditPost = {
   id: string;
   fullname: string;
@@ -41,6 +52,10 @@ export type RedditPost = {
   videoHeight: number | null;
   mediaKind: RedditMediaKind;
   flair: string | null;
+  flairType: string | null;
+  flairRichtext: RedditFlairPart[];
+  flairBackgroundColor: string | null;
+  flairTextColor: string | null;
   isSelf: boolean;
   isNsfw: boolean;
   nsfw: boolean;

@@ -2,6 +2,17 @@ export type PostKind = "text" | "image" | "gif" | "link" | "video";
 export type SortKey = "hot" | "top" | "new" | "rising" | "controversial" | "best";
 export type TimeRangeKey = "hour" | "day" | "week" | "month" | "year" | "all";
 
+export type FlairPart =
+  | {
+      type: "text";
+      text: string;
+    }
+  | {
+      type: "emoji";
+      alt: string;
+      url: string | null;
+    };
+
 export type RedditPostCardData = {
   id: string;
   title: string;
@@ -36,6 +47,10 @@ export type RedditPostCardData = {
   thumbnail?: string | null;
   thumbnailUrl?: string | null;
   flair?: string | null;
+  flairType?: string | null;
+  flairRichtext?: FlairPart[];
+  flairBackgroundColor?: string | null;
+  flairTextColor?: string | null;
   over18?: boolean;
   isStickied?: boolean;
   stickied?: boolean;
