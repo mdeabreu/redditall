@@ -7,3 +7,4 @@ dist
 *.tsbuildinfo
 ChatGPT Image May *.png
 .DS_Store
+.vercel
