@@ -23,14 +23,7 @@ export async function GET(request: Request) {
   let response: Response;
 
   try {
-    response = await fetch(redditUrl, {
-      headers: {
-        Accept: "application/json",
-        "Accept-Language": "en-US,en;q=0.9",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 Rill/0.1",
-      },
-      cache: "no-store",
-    });
+    response = await fetchRedditJson(redditUrl);
   } catch (error) {
     return NextResponse.json(
       {
@@ -40,6 +33,12 @@ export async function GET(request: Request) {
       },
       { status: 502 },
     );
+  }
+
+  if (!response.ok && response.status === 403) {
+    const oldRedditUrl = new URL(redditUrl);
+    oldRedditUrl.hostname = "old.reddit.com";
+    response = await fetchRedditJson(oldRedditUrl.toString()).catch(() => response);
   }
 
   if (!response.ok) {
@@ -58,4 +57,15 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(await response.json());
+}
+
+function fetchRedditJson(url: string) {
+  return fetch(url, {
+    headers: {
+      Accept: "application/json",
+      "Accept-Language": "en-US,en;q=0.9",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 Rill/0.1",
+    },
+    cache: "no-store",
+  });
 }
