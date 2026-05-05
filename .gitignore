@@ -8,3 +8,4 @@ dist
 ChatGPT Image May *.png
 .DS_Store
 .vercel
+.test-build

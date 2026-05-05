@@ -2,6 +2,8 @@ export { REDDIT_SORTS, REDDIT_TIME_RANGES } from "./reddit/constants";
 export {
   buildRedditListingUrl,
   buildRedditProxyUrl,
+} from "./reddit/urls";
+export {
   fetchLocalRedditListing,
   fetchRedditListing,
   fetchSubredditPage,
