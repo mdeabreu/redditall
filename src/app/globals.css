@@ -3182,6 +3182,33 @@ button {
   color: var(--blue-600);
 }
 
+.ar-sort-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 16px 14px;
+  overflow: visible;
+}
+
+.ar-sort-chip {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.ar-sort-chip:focus-visible,
+.ar-sort-chip[data-state="open"] {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(147, 197, 253, 0.22);
+}
+
+.ar-sort-chip + .ar-sort-chip {
+  margin-left: 0;
+}
+
 @media (max-width: 460px) {
   .app-shell {
     padding: 0;

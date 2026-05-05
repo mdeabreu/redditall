@@ -5,4 +5,5 @@ dist
 .env*
 !.env.example
 *.tsbuildinfo
-
+ChatGPT Image May *.png
+.DS_Store
