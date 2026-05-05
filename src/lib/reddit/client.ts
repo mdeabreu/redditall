@@ -67,16 +67,11 @@ export async function fetchRedditListing(
 ): Promise<RedditListing> {
   const subreddit = normalizeSubreddit(request.subreddit);
   const sort = normalizeRedditSort(request.sort);
-  const url =
-    typeof window === "undefined"
-      ? buildRedditListingUrl({ ...request, subreddit, sort })
-      : buildRedditProxyUrl({ ...request, subreddit, sort });
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-    },
-    signal: request.signal,
-  });
+  const normalizedRequest = { ...request, subreddit, sort };
+  const directUrl = buildRedditListingUrl(normalizedRequest);
+  const response = typeof window === "undefined"
+    ? await fetchJson(directUrl, request.signal)
+    : await fetchJsonWithProxyFallback(directUrl, buildRedditProxyUrl(normalizedRequest), request.signal);
 
   if (!response.ok) {
     if (request.fallbackUrl) {
@@ -130,4 +125,36 @@ async function readErrorMessage(response: Response): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+async function fetchJson(url: string, signal?: AbortSignal): Promise<Response> {
+  return fetch(url, {
+    headers: {
+      Accept: "application/json",
+    },
+    signal,
+  });
+}
+
+async function fetchJsonWithProxyFallback(
+  directUrl: string,
+  proxyUrl: string,
+  signal?: AbortSignal,
+): Promise<Response> {
+  try {
+    const directResponse = await fetchJson(directUrl, signal);
+    if (directResponse.ok) {
+      return directResponse;
+    }
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw error;
+    }
+  }
+
+  return fetchJson(proxyUrl, signal);
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
 }
