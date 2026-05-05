@@ -20,6 +20,8 @@ export function PostMeta({
         by{" "}
         <a
           href={`https://www.reddit.com/user/${post.author}`}
+          target="_blank"
+          rel="noreferrer"
         >
           {post.author}
         </a>
@@ -41,6 +43,8 @@ export function PostMeta({
         <span aria-hidden="true" className="ar-meta-dot">•</span>
         <a
           href={`${post.redditUrl ?? post.url ?? "#"}#comments`}
+          target="_blank"
+          rel="noreferrer"
         >
           {formatCommentCount(comments)}
         </a>

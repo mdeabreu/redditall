@@ -30,7 +30,7 @@ export function PostCard({
   const isStickied = post.isStickied === true || post.stickied === true;
   const body = post.body ?? post.excerpt;
   const title = (
-    <a className="ar-post-title" href={post.redditUrl ?? post.url ?? "#"}>
+    <a className="ar-post-title" href={post.redditUrl ?? post.url ?? "#"} target="_blank" rel="noreferrer">
       {post.title}
     </a>
   );
