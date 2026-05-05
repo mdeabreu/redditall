@@ -37,7 +37,7 @@ export function NavigationDrawer({
         <div className="drawerHeader">
           <div className="redditMark">r</div>
           <div>
-            <strong>Alternative Reddit</strong>
+            <strong>Rill</strong>
             <span>Mobile reader</span>
           </div>
           <button className="iconButton" type="button" aria-label="Close" onClick={onClose}>

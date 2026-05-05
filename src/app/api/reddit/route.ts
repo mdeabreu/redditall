@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     response = await fetch(redditUrl, {
       headers: {
         Accept: "application/json",
-        "User-Agent": "alternative-reddit-frontend/0.1",
+        "User-Agent": "rill-reader/0.1",
       },
       cache: "no-store",
     });
