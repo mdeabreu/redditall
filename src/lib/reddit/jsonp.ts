@@ -10,7 +10,7 @@ export function fetchRedditJsonp(url: string, signal?: AbortSignal): Promise<unk
       return;
     }
 
-    const callbackName = `__rillRedditJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const callbackName = `__redditAllJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const callbackTarget = window as unknown as Record<string, unknown>;
     const script = document.createElement("script");
     const jsonpUrl = new URL(url);

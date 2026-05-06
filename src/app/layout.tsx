@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Rill",
-  description: "A calm, client-side Reddit reader.",
+  title: "ReddItAll",
+  description: "A calm, client-side Reddit reader for every subreddit.",
   icons: {
     icon: [
       { url: "/favicon.png", sizes: "32x32", type: "image/png" },

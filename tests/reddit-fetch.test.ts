@@ -17,7 +17,7 @@ const payload = {
           subreddit: "gifs",
           subreddit_name_prefixed: "r/gifs",
           title: "A good post",
-          author: "rill-test",
+          author: "redditall-test",
           permalink: "/r/gifs/comments/abc123/a_good_post/",
           url: "https://example.com/post",
           domain: "example.com",

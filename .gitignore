@@ -9,3 +9,4 @@ ChatGPT Image May *.png
 .DS_Store
 .vercel
 .test-build
+.env*.local

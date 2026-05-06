@@ -2,7 +2,7 @@ import { fetchJson } from "./transport";
 
 const SERVER_REDDIT_HEADERS = {
   "Accept-Language": "en-US,en;q=0.9",
-  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 Rill/0.1",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 ReddItAll/0.1",
 };
 
 export async function fetchServerRedditResponse(redditUrl: string): Promise<Response> {

@@ -12,15 +12,18 @@ export type FeedPrefs = {
   recentSubreddits: string[];
 };
 
-const SELECTED_SUBREDDIT_KEY = "reddit-frontend:selected-subreddit";
-const RECENT_SUBREDDITS_KEY = "reddit-frontend:recent-subreddits";
-const SORT_KEY = "reddit-frontend:sort";
+const SELECTED_SUBREDDIT_KEY = "redditall:selected-subreddit";
+const RECENT_SUBREDDITS_KEY = "redditall:recent-subreddits";
+const SORT_KEY = "redditall:sort";
+const LEGACY_SELECTED_SUBREDDIT_KEY = "reddit-frontend:selected-subreddit";
+const LEGACY_RECENT_SUBREDDITS_KEY = "reddit-frontend:recent-subreddits";
+const LEGACY_SORT_KEY = "reddit-frontend:sort";
 const DEFAULT_SELECTED_SUBREDDIT = "all";
 const DEFAULT_RECENT_SUBREDDITS = [DEFAULT_SELECTED_SUBREDDIT];
 const MAX_RECENT_SUBREDDITS = 12;
 
 export function getSelectedSubreddit(fallback = DEFAULT_SELECTED_SUBREDDIT): string {
-  const value = readStorage(SELECTED_SUBREDDIT_KEY);
+  const value = readStorageWithLegacy(SELECTED_SUBREDDIT_KEY, LEGACY_SELECTED_SUBREDDIT_KEY);
   return value ? normalizeSubreddit(value) : normalizeSubreddit(fallback);
 }
 
@@ -32,7 +35,7 @@ export function setSelectedSubreddit(subreddit: string): string {
 }
 
 export function getRecentSubreddits(fallback: string[] = DEFAULT_RECENT_SUBREDDITS): string[] {
-  const parsed = parseStringArray(readStorage(RECENT_SUBREDDITS_KEY));
+  const parsed = parseStringArray(readStorageWithLegacy(RECENT_SUBREDDITS_KEY, LEGACY_RECENT_SUBREDDITS_KEY));
   const source = parsed.length > 0 ? parsed : fallback;
   return dedupeSubreddits(source).slice(0, MAX_RECENT_SUBREDDITS);
 }
@@ -49,7 +52,7 @@ export function addRecentSubreddit(subreddit: string): string[] {
 }
 
 export function getSelectedSort(fallback: RedditSort = "hot"): RedditSort {
-  return normalizeRedditSort(readStorage(SORT_KEY) || fallback);
+  return normalizeRedditSort(readStorageWithLegacy(SORT_KEY, LEGACY_SORT_KEY) || fallback);
 }
 
 export function setSelectedSort(sort: RedditSort | string): RedditSort {
@@ -110,6 +113,9 @@ export function clearRedditPreferences(): void {
   removeStorage(SELECTED_SUBREDDIT_KEY);
   removeStorage(RECENT_SUBREDDITS_KEY);
   removeStorage(SORT_KEY);
+  removeStorage(LEGACY_SELECTED_SUBREDDIT_KEY);
+  removeStorage(LEGACY_RECENT_SUBREDDITS_KEY);
+  removeStorage(LEGACY_SORT_KEY);
 }
 
 function dedupeSubreddits(subreddits: string[]): string[] {
@@ -147,6 +153,20 @@ function readStorage(key: string): string | null {
   } catch {
     return null;
   }
+}
+
+function readStorageWithLegacy(key: string, legacyKey: string): string | null {
+  const value = readStorage(key);
+  if (value !== null) {
+    return value;
+  }
+
+  const legacyValue = readStorage(legacyKey);
+  if (legacyValue !== null) {
+    writeStorage(key, legacyValue);
+  }
+
+  return legacyValue;
 }
 
 function writeStorage(key: string, value: string): void {
