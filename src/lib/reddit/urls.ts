@@ -56,8 +56,13 @@ export function buildRedditProxyUrl(request: RedditListingRequest = {}): string 
 }
 
 function applySearchParams(url: URL, request: RedditListingRequest, query: string) {
+  const searchSort = normalizeRedditSearchSort(request.searchSort);
   url.searchParams.set("q", query);
-  url.searchParams.set("sort", normalizeRedditSearchSort(request.searchSort));
+  url.searchParams.set("sort", searchSort);
+
+  if (searchSort === "top") {
+    url.searchParams.set("t", normalizeRedditTimeRange(request.timeRange));
+  }
 
   if (request.restrictToSubreddit) {
     url.searchParams.set("restrict_sr", "on");

@@ -54,12 +54,14 @@ test("builds unrestricted search URLs without restrict_sr", () => {
     restrictToSubreddit: false,
     searchSort: "top",
     subreddit: "survivor",
+    timeRange: "year",
   }));
 
   assert.equal(url.pathname, "/r/survivor/search.json");
   assert.equal(url.searchParams.get("q"), "hidden immunity");
   assert.equal(url.searchParams.get("restrict_sr"), null);
   assert.equal(url.searchParams.get("sort"), "top");
+  assert.equal(url.searchParams.get("t"), "year");
 });
 
 test("normalizes invalid search sorts to relevance", () => {
@@ -96,4 +98,16 @@ test("preserves pagination params for search URLs", () => {
   assert.equal(redditUrl.searchParams.get("count"), "25");
   assert.equal(redditUrl.searchParams.get("limit"), "50");
   assert.equal(proxyUrl, "/api/reddit?subreddit=survivor&q=idol&sort=comments&restrict_sr=on&after=t3_after&count=25&limit=50");
+});
+
+test("builds proxy URLs with top search time range", () => {
+  const url = buildRedditProxyUrl({
+    query: "idol",
+    restrictToSubreddit: true,
+    searchSort: "top",
+    subreddit: "survivor",
+    timeRange: "month",
+  });
+
+  assert.equal(url, "/api/reddit?subreddit=survivor&q=idol&sort=top&t=month&restrict_sr=on");
 });

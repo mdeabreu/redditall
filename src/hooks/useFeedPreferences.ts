@@ -179,7 +179,7 @@ function readFeedRoute(pathname: string, search = ""): FeedRoutePrefs | null {
   return {
     subreddit: normalizeSubreddit(decodeURIComponent(rawSubreddit)),
     sort,
-    timeRange: sort === "top" ? normalizeRedditTimeRange(searchParams.get("t")) : "day",
+    timeRange: sort === "top" || searchQuery ? normalizeRedditTimeRange(searchParams.get("t")) : "day",
     searchQuery,
     searchSort: searchQuery ? normalizeRedditSearchSort(searchParams.get("sort")) : "relevance",
     restrictToSubreddit: searchQuery ? searchParams.get("restrict_sr") === "on" : true,
@@ -209,7 +209,11 @@ function buildFeedPath({
     if (restrictToSubreddit) {
       searchParams.set("restrict_sr", "on");
     }
-    searchParams.set("sort", normalizeRedditSearchSort(searchSort));
+    const normalizedSearchSort = normalizeRedditSearchSort(searchSort);
+    searchParams.set("sort", normalizedSearchSort);
+    if (normalizedSearchSort === "top") {
+      searchParams.set("t", normalizeRedditTimeRange(timeRange));
+    }
     return `/r/${normalizedSubreddit}/search?${searchParams.toString()}`;
   }
 

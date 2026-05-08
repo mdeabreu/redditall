@@ -47,7 +47,10 @@ export function FeedShell({
       <MobileHeader subreddit={subreddit} onMenuClick={onMenu} onSubredditChange={onSubredditChange} />
       <div className="ar-sort-row">
         {searchMode ? (
-          <SearchSortChip value={searchSort} onChange={onSearchSortChange} />
+          <>
+            <SearchSortChip value={searchSort} onChange={onSearchSortChange} />
+            {searchSort === "top" ? <TimeRangeChip value={timeRange} onChange={onTimeRangeChange} /> : null}
+          </>
         ) : (
           <>
             <SortChip value={sort} onChange={onSortChange} />
