@@ -98,11 +98,16 @@ export function PostCard({
   return (
     <article className={`ar-post-card ar-post-card-${kind}`}>
       {hideSpoilerContent && hasMedia ? (
-        <div className="ar-spoiler-cover ar-spoiler-cover-media">
-          {obfuscatedImageUrl ? <img src={obfuscatedImageUrl} alt="" loading="lazy" /> : null}
-          <div className="ar-spoiler-cover-copy">
-            <span>Spoiler hidden</span>
-            {revealButton}
+        <div className="ar-spoiler-media-frame">
+          <div className="ar-spoiler-media-content" aria-hidden="true">
+            {media}
+          </div>
+          <div className="ar-spoiler-cover ar-spoiler-cover-media">
+            {obfuscatedImageUrl ? <img src={obfuscatedImageUrl} alt="" loading="lazy" /> : null}
+            <div className="ar-spoiler-cover-copy">
+              <span>Spoiler hidden</span>
+              {revealButton}
+            </div>
           </div>
         </div>
       ) : (
