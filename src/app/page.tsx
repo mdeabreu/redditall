@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2 } from "@/components/FallbackIcon";
 import { EmptyState, FeedShell, FeedSkeleton, LoadMoreButton, PostCard } from "@/components";
 import { Drawer } from "@/components/DetailViews";
@@ -8,6 +8,20 @@ import { useFeedPosts } from "@/hooks/useFeedPosts";
 import { useFeedPreferences } from "@/hooks/useFeedPreferences";
 
 export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="app-shell">
+          <FeedSkeleton />
+        </main>
+      }
+    >
+      <HomePageContent />
+    </Suspense>
+  );
+}
+
+function HomePageContent() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const {

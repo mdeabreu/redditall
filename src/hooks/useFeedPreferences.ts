@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   normalizeRedditSort,
   normalizeRedditSearchSort,
@@ -30,6 +30,8 @@ type UseFeedPreferencesOptions = {
 export function useFeedPreferences({ onRouteSelectionChange }: UseFeedPreferencesOptions = {}) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const routeSearch = searchParams.toString() ? `?${searchParams.toString()}` : "";
   const [subreddit, setSubreddit] = useState("all");
   const [sort, setSort] = useState<SortMode>("hot");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,7 +40,6 @@ export function useFeedPreferences({ onRouteSelectionChange }: UseFeedPreference
   const [timeRange, setTimeRange] = useState<RedditTimeRange>("day");
   const [recentSubreddits, setRecentSubreddits] = useState<string[]>(["all"]);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
-  const [locationSearch, setLocationSearch] = useState("");
 
   useEffect(() => {
     const prefs = readPrefs();
@@ -50,20 +51,13 @@ export function useFeedPreferences({ onRouteSelectionChange }: UseFeedPreference
     setRestrictToSubreddit(routePrefs?.restrictToSubreddit ?? true);
     setTimeRange(routePrefs?.timeRange ?? "day");
     setRecentSubreddits(prefs.recentSubreddits.length > 0 ? prefs.recentSubreddits : ["all"]);
-    setLocationSearch(window.location.search);
     setPrefsLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    const syncLocationSearch = () => setLocationSearch(window.location.search);
-    window.addEventListener("popstate", syncLocationSearch);
-    return () => window.removeEventListener("popstate", syncLocationSearch);
   }, []);
 
   useEffect(() => {
     if (!prefsLoaded) return;
 
-    const routePrefs = readFeedRoute(pathname, locationSearch);
+    const routePrefs = readFeedRoute(pathname, routeSearch);
     if (!routePrefs) return;
 
     if (
@@ -83,7 +77,7 @@ export function useFeedPreferences({ onRouteSelectionChange }: UseFeedPreference
       onRouteSelectionChange?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationSearch, pathname, prefsLoaded]);
+  }, [pathname, prefsLoaded, routeSearch]);
 
   useEffect(() => {
     if (!prefsLoaded) return;
@@ -103,12 +97,11 @@ export function useFeedPreferences({ onRouteSelectionChange }: UseFeedPreference
       searchSort,
       restrictToSubreddit,
     });
-    const currentPath = `${pathname}${locationSearch}`;
+    const currentPath = `${pathname}${routeSearch}`;
     if (currentPath !== nextPath) {
       router.replace(nextPath, { scroll: false });
-      setLocationSearch(nextPath.includes("?") ? `?${nextPath.split("?")[1]}` : "");
     }
-  }, [locationSearch, pathname, prefsLoaded, restrictToSubreddit, router, searchQuery, searchSort, sort, subreddit, timeRange]);
+  }, [pathname, prefsLoaded, restrictToSubreddit, routeSearch, router, searchQuery, searchSort, sort, subreddit, timeRange]);
 
   function handleSubredditChange(nextSubreddit: string) {
     setSubreddit(nextSubreddit);
