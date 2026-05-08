@@ -1,4 +1,4 @@
-export { REDDIT_SORTS, REDDIT_TIME_RANGES } from "./reddit/constants";
+export { REDDIT_SEARCH_SORTS, REDDIT_SORTS, REDDIT_TIME_RANGES } from "./reddit/constants";
 export {
   buildRedditListingUrl,
   buildRedditProxyUrl,
@@ -12,6 +12,7 @@ export { normalizeRedditPost, parseRedditListing } from "./reddit/listing";
 export {
   isRedditSort,
   isRedditTimeRange,
+  normalizeRedditSearchSort,
   normalizeRedditSort,
   normalizeRedditTimeRange,
   normalizeSubreddit,
@@ -23,6 +24,7 @@ export type {
   RedditListingRequest,
   RedditMediaKind,
   RedditPost,
+  RedditSearchSort,
   RedditSort,
   RedditTimeRange,
   SortMode,

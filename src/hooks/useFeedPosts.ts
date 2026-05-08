@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   fetchSubredditPage,
   type FeedPost,
+  type RedditSearchSort,
   type RedditTimeRange,
   type SortMode,
 } from "@/lib/reddit";
@@ -13,11 +14,22 @@ export type FeedStatus = "idle" | "loading" | "loading-more" | "error" | "succes
 type UseFeedPostsOptions = {
   subreddit: string;
   sort: SortMode;
+  searchQuery?: string;
+  searchSort?: RedditSearchSort;
+  restrictToSubreddit?: boolean;
   timeRange: RedditTimeRange;
   enabled: boolean;
 };
 
-export function useFeedPosts({ subreddit, sort, timeRange, enabled }: UseFeedPostsOptions) {
+export function useFeedPosts({
+  subreddit,
+  sort,
+  searchQuery = "",
+  searchSort = "relevance",
+  restrictToSubreddit = true,
+  timeRange,
+  enabled,
+}: UseFeedPostsOptions) {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [after, setAfter] = useState<string | null>(null);
   const [count, setCount] = useState(0);
@@ -27,17 +39,46 @@ export function useFeedPosts({ subreddit, sort, timeRange, enabled }: UseFeedPos
   useEffect(() => {
     if (!enabled) return;
 
-    void loadInitial(subreddit, sort, timeRange);
+    void loadInitial({
+      nextSubreddit: subreddit,
+      nextSort: sort,
+      nextTimeRange: timeRange,
+      nextSearchQuery: searchQuery,
+      nextSearchSort: searchSort,
+      nextRestrictToSubreddit: restrictToSubreddit,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, subreddit, sort, timeRange]);
+  }, [enabled, restrictToSubreddit, searchQuery, searchSort, subreddit, sort, timeRange]);
 
-  async function loadInitial(nextSubreddit = subreddit, nextSort = sort, nextTimeRange = timeRange) {
+  async function loadInitial({
+    nextSubreddit = subreddit,
+    nextSort = sort,
+    nextTimeRange = timeRange,
+    nextSearchQuery = searchQuery,
+    nextSearchSort = searchSort,
+    nextRestrictToSubreddit = restrictToSubreddit,
+  }: {
+    nextSubreddit?: string;
+    nextSort?: SortMode;
+    nextTimeRange?: RedditTimeRange;
+    nextSearchQuery?: string;
+    nextSearchSort?: RedditSearchSort;
+    nextRestrictToSubreddit?: boolean;
+  } = {}) {
     setStatus("loading");
     setMessage("");
 
     try {
-      const page = await fetchSubredditPage({ subreddit: nextSubreddit, sort: nextSort, timeRange: nextTimeRange, limit: 25 });
-      if (page.posts.length === 0 && nextSubreddit === "all") {
+      const page = await fetchSubredditPage({
+        subreddit: nextSubreddit,
+        sort: nextSort,
+        query: nextSearchQuery,
+        searchSort: nextSearchSort,
+        restrictToSubreddit: nextRestrictToSubreddit,
+        timeRange: nextTimeRange,
+        limit: 25,
+      });
+      if (page.posts.length === 0 && nextSubreddit === "all" && !nextSearchQuery.trim()) {
         throw new Error("Empty Reddit response for r/all");
       }
       setPosts(page.posts);
@@ -58,7 +99,17 @@ export function useFeedPosts({ subreddit, sort, timeRange, enabled }: UseFeedPos
     setStatus("loading-more");
 
     try {
-      const page = await fetchSubredditPage({ subreddit, sort, timeRange, after, count, limit: 25 });
+      const page = await fetchSubredditPage({
+        subreddit,
+        sort,
+        query: searchQuery,
+        searchSort,
+        restrictToSubreddit,
+        timeRange,
+        after,
+        count,
+        limit: 25,
+      });
       setPosts((current) => [...current, ...page.posts]);
       setAfter(page.after);
       setCount((current) => current + page.posts.length);

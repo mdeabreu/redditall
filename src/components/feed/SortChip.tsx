@@ -1,7 +1,7 @@
 import { DropdownMenu } from "radix-ui";
 
 import { Icon } from "../ui/Icon";
-import type { SortKey, TimeRangeKey } from "./types";
+import type { SearchSortKey, SortKey, TimeRangeKey } from "./types";
 
 const sortLabels: Record<SortKey, string> = {
   hot: "Hot",
@@ -19,6 +19,13 @@ const timeRangeLabels: Record<TimeRangeKey, string> = {
   month: "Month",
   year: "Year",
   all: "All",
+};
+
+const searchSortLabels: Record<SearchSortKey, string> = {
+  relevance: "Relevance",
+  top: "Top",
+  new: "New",
+  comments: "Comments",
 };
 
 export function SortChip({
@@ -43,6 +50,40 @@ export function SortChip({
         <DropdownMenu.Content className="ar-sort-menu-content" align="start" sideOffset={6}>
           <DropdownMenu.RadioGroup value={value} onValueChange={(nextValue) => onChange?.(nextValue as SortKey)}>
             {Object.entries(sortLabels).map(([key, label]) => (
+              <DropdownMenu.RadioItem key={key} className="ar-sort-menu-item" value={key}>
+                <span>{label}</span>
+                <DropdownMenu.ItemIndicator className="ar-sort-menu-indicator">✓</DropdownMenu.ItemIndicator>
+              </DropdownMenu.RadioItem>
+            ))}
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
+export function SearchSortChip({
+  value = "relevance",
+  disabled,
+  onChange,
+}: {
+  value?: SearchSortKey;
+  disabled?: boolean;
+  onChange?: (value: SearchSortKey) => void;
+}) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild disabled={disabled}>
+        <button className="ar-sort-chip" type="button" aria-label="Sort search results">
+          <Icon name="search" />
+          <span>{searchSortLabels[value]}</span>
+          <Icon name="chevron" />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className="ar-sort-menu-content" align="start" sideOffset={6}>
+          <DropdownMenu.RadioGroup value={value} onValueChange={(nextValue) => onChange?.(nextValue as SearchSortKey)}>
+            {Object.entries(searchSortLabels).map(([key, label]) => (
               <DropdownMenu.RadioItem key={key} className="ar-sort-menu-item" value={key}>
                 <span>{label}</span>
                 <DropdownMenu.ItemIndicator className="ar-sort-menu-indicator">✓</DropdownMenu.ItemIndicator>

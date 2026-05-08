@@ -12,12 +12,12 @@ import {
   getVideoPosterUrl,
   hasDefaultThumbnail,
 } from "./media";
-import { normalizeRedditSort, normalizeSubreddit } from "./normalize";
+import { normalizeRedditSearchSort, normalizeRedditSort, normalizeSubreddit } from "./normalize";
 import type { RedditChild, RedditListing, RedditListingData, RedditListingRequest, RedditPost } from "./types";
 
 export function parseRedditListing(
   payload: unknown,
-  request: Pick<RedditListingRequest, "subreddit" | "sort" | "timeRange"> = {},
+  request: Pick<RedditListingRequest, "subreddit" | "sort" | "timeRange" | "query" | "searchSort"> = {},
 ): RedditListing {
   const listingData = getListingData(payload);
   const children = getChildren(listingData, payload);
@@ -27,7 +27,7 @@ export function parseRedditListing(
 
   return {
     subreddit: normalizeSubreddit(request.subreddit),
-    sort: normalizeRedditSort(request.sort),
+    sort: request.query ? normalizeRedditSearchSort(request.searchSort) : normalizeRedditSort(request.sort),
     after: asStringOrNull(listingData?.after),
     before: asStringOrNull(listingData?.before),
     count: asNumber(listingData?.dist) ?? posts.length,

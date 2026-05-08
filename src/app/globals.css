@@ -3092,6 +3092,74 @@ button {
   color: var(--text);
 }
 
+.ar-drawer-search-form {
+  display: grid;
+  gap: 10px;
+  margin: 14px 12px;
+}
+
+.ar-drawer-search-form .ar-drawer-search {
+  margin: 0;
+}
+
+.ar-search-limit-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.ar-search-limit-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--blue-500);
+}
+
+.ar-drawer-search-submit {
+  width: 100%;
+  justify-content: center;
+}
+
+.ar-search-context {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.ar-search-context h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.ar-secondary-button {
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: var(--surface-3);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ar-secondary-button:hover {
+  background: var(--blue-50);
+  color: var(--blue-600);
+}
+
 .ar-drawer-list {
   display: grid;
   gap: 4px;

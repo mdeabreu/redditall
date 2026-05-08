@@ -1,6 +1,6 @@
 import { createRedditHttpError } from "./errors";
 import { parseRedditListing } from "./listing";
-import { normalizeRedditSort, normalizeSubreddit } from "./normalize";
+import { normalizeRedditSearchSort, normalizeRedditSort, normalizeSubreddit } from "./normalize";
 import { fetchBrowserRedditPayload, fetchJson } from "./transport";
 import type { RedditListing, RedditListingRequest } from "./types";
 import { buildRedditListingUrl, buildRedditProxyUrl } from "./urls";
@@ -10,14 +10,16 @@ export async function fetchRedditListing(
 ): Promise<RedditListing> {
   const subreddit = normalizeSubreddit(request.subreddit);
   const sort = normalizeRedditSort(request.sort);
-  const normalizedRequest = { ...request, subreddit, sort };
+  const query = typeof request.query === "string" ? request.query.trim() : "";
+  const searchSort = normalizeRedditSearchSort(request.searchSort);
+  const normalizedRequest = { ...request, subreddit, sort, query, searchSort };
   const directUrl = buildRedditListingUrl(normalizedRequest);
   const directPayload = typeof window === "undefined"
     ? null
     : await fetchBrowserRedditPayload(directUrl, request.signal);
 
   if (directPayload !== null) {
-    return parseRedditListing(directPayload.payload, { subreddit, sort });
+    return parseRedditListing(directPayload.payload, { subreddit, sort, query, searchSort });
   }
 
   const { response, source } = typeof window === "undefined"
@@ -26,13 +28,13 @@ export async function fetchRedditListing(
 
   if (!response.ok) {
     if (request.fallbackUrl) {
-      return fetchLocalRedditListing(request.fallbackUrl, { ...request, subreddit, sort });
+      return fetchLocalRedditListing(request.fallbackUrl, { ...request, subreddit, sort, query, searchSort });
     }
 
     throw await createRedditHttpError(response, source);
   }
 
-  return parseRedditListing(await response.json(), { subreddit, sort });
+  return parseRedditListing(await response.json(), { subreddit, sort, query, searchSort });
 }
 
 export async function fetchSubredditPage(

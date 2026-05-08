@@ -1,5 +1,6 @@
 export type PostKind = "text" | "image" | "gif" | "link" | "video";
 export type SortKey = "hot" | "top" | "new" | "rising" | "controversial" | "best";
+export type SearchSortKey = "relevance" | "top" | "new" | "comments";
 export type TimeRangeKey = "hour" | "day" | "week" | "month" | "year" | "all";
 
 export type FlairPart =

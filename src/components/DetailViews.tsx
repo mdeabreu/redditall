@@ -1,5 +1,6 @@
 import { ArrowLeft, ExternalLink, MessageSquare, Search, UserRound, X } from "@/components/FallbackIcon";
 import type { FeedPost } from "@/lib/reddit";
+import { useEffect, useState } from "react";
 
 type PanelProps = {
   post: FeedPost;
@@ -9,18 +10,35 @@ type PanelProps = {
 export function Drawer({
   open,
   subreddit,
+  searchQuery = "",
+  restrictToSubreddit = true,
   recentSubreddits = ["all"],
   onClose,
+  onSearch,
   onSubredditChange,
   onRemoveSubreddit,
 }: {
   open: boolean;
   subreddit: string;
+  searchQuery?: string;
+  restrictToSubreddit?: boolean;
   recentSubreddits?: string[];
   onClose: () => void;
+  onSearch: (query: string, restrictToSubreddit: boolean) => void;
   onSubredditChange: (subreddit: string) => void;
   onRemoveSubreddit?: (subreddit: string) => void;
 }) {
+  const [draftSearchQuery, setDraftSearchQuery] = useState(searchQuery);
+  const [draftRestrictToSubreddit, setDraftRestrictToSubreddit] = useState(restrictToSubreddit);
+
+  useEffect(() => {
+    setDraftSearchQuery(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setDraftRestrictToSubreddit(restrictToSubreddit);
+  }, [restrictToSubreddit]);
+
   if (!open) return null;
 
   const currentSubreddit = subreddit.replace(/^\/?r\//i, "").toLowerCase();
@@ -32,29 +50,45 @@ export function Drawer({
       <nav className="ar-drawer">
         <div className="ar-panel-header">
           <div>
-            <p className="ar-eyebrow">Communities</p>
-            <h2>Choose a subreddit</h2>
+            <p className="ar-eyebrow">Search</p>
+            <h2>Find posts</h2>
           </div>
           <button className="ar-icon-button" type="button" aria-label="Close menu" onClick={onClose}>
             <X size={18} />
           </button>
         </div>
-        <label className="ar-drawer-search">
-          <Search size={16} />
-          <input
-            defaultValue={`r/${subreddit}`}
-            aria-label="Subreddit"
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                const nextSubreddit = event.currentTarget.value.trim();
-                if (nextSubreddit) {
-                  onSubredditChange(nextSubreddit);
-                }
-                onClose();
-              }
-            }}
-          />
-        </label>
+        <form
+          className="ar-drawer-search-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const normalizedQuery = draftSearchQuery.trim();
+            if (!normalizedQuery) return;
+            onSearch(normalizedQuery, draftRestrictToSubreddit);
+            onClose();
+          }}
+        >
+          <label className="ar-drawer-search">
+            <Search size={16} />
+            <input
+              value={draftSearchQuery}
+              aria-label="Search posts"
+              placeholder="Search posts"
+              enterKeyHint="search"
+              onChange={(event) => setDraftSearchQuery(event.target.value)}
+            />
+          </label>
+          <label className="ar-search-limit-toggle">
+            <input
+              type="checkbox"
+              checked={draftRestrictToSubreddit}
+              onChange={(event) => setDraftRestrictToSubreddit(event.target.checked)}
+            />
+            <span>Limit to r/{currentSubreddit}</span>
+          </label>
+          <button className="ar-primary-button ar-drawer-search-submit" type="submit" disabled={!draftSearchQuery.trim()}>
+            Search
+          </button>
+        </form>
         <div className="ar-drawer-list">
           {communities.map((name) => {
             const normalizedName = name.replace(/^\/?r\//i, "");

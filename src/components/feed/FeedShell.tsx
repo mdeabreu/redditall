@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 
 import { PostCardSkeleton } from "../post/PostCardSkeleton";
 import { MobileHeader } from "./MobileHeader";
-import { SortChip, TimeRangeChip } from "./SortChip";
-import type { SortKey, TimeRangeKey } from "./types";
+import { SearchSortChip, SortChip, TimeRangeChip } from "./SortChip";
+import type { SearchSortKey, SortKey, TimeRangeKey } from "./types";
 
 export function FeedSkeleton({ count = 3 }: { count?: number }) {
   return (
@@ -18,8 +18,11 @@ export function FeedSkeleton({ count = 3 }: { count?: number }) {
 export function FeedShell({
   subreddit,
   sort = "hot",
+  searchSort = "relevance",
+  searchMode = false,
   timeRange = "day",
   onSortChange,
+  onSearchSortChange,
   onTimeRangeChange,
   onSubredditChange,
   onMenu,
@@ -28,8 +31,11 @@ export function FeedShell({
 }: {
   subreddit?: string;
   sort?: SortKey;
+  searchSort?: SearchSortKey;
+  searchMode?: boolean;
   timeRange?: TimeRangeKey;
   onSortChange?: (sort: SortKey) => void;
+  onSearchSortChange?: (sort: SearchSortKey) => void;
   onTimeRangeChange?: (timeRange: TimeRangeKey) => void;
   onSubredditChange?: (subreddit: string) => void;
   onMenu?: () => void;
@@ -40,8 +46,14 @@ export function FeedShell({
     <section className="ar-feed-shell">
       <MobileHeader subreddit={subreddit} onMenuClick={onMenu} onSubredditChange={onSubredditChange} />
       <div className="ar-sort-row">
-        <SortChip value={sort} onChange={onSortChange} />
-        {sort === "top" ? <TimeRangeChip value={timeRange} onChange={onTimeRangeChange} /> : null}
+        {searchMode ? (
+          <SearchSortChip value={searchSort} onChange={onSearchSortChange} />
+        ) : (
+          <>
+            <SortChip value={sort} onChange={onSortChange} />
+            {sort === "top" ? <TimeRangeChip value={timeRange} onChange={onTimeRangeChange} /> : null}
+          </>
+        )}
       </div>
       <div className="ar-feed-stack">{children}</div>
       {footer ? <div className="ar-feed-footer">{footer}</div> : null}

@@ -1,10 +1,10 @@
 export { FeedShell, FeedSkeleton } from "./feed/FeedShell";
 export { MobileHeader } from "./feed/MobileHeader";
-export { SortChip, TimeRangeChip } from "./feed/SortChip";
+export { SearchSortChip, SortChip, TimeRangeChip } from "./feed/SortChip";
 export { PostCard } from "./post/PostCard";
 export { PostCardSkeleton } from "./post/PostCardSkeleton";
 export { PostMeta } from "./post/PostMeta";
 export { PostTypeBadge } from "./post/PostTypeBadge";
 export { EmptyState, ErrorState, LoadMoreButton } from "./ui/StateViews";
 
-export type { PostKind, RedditPostCardData, SortKey, TimeRangeKey } from "./feed/types";
+export type { PostKind, RedditPostCardData, SearchSortKey, SortKey, TimeRangeKey } from "./feed/types";

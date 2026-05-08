@@ -1,5 +1,5 @@
-import { DEFAULT_SUBREDDIT, REDDIT_SORTS, REDDIT_TIME_RANGES } from "./constants";
-import type { RedditSort, RedditTimeRange } from "./types";
+import { DEFAULT_SUBREDDIT, REDDIT_SEARCH_SORTS, REDDIT_SORTS, REDDIT_TIME_RANGES } from "./constants";
+import type { RedditSearchSort, RedditSort, RedditTimeRange } from "./types";
 
 export function isRedditSort(value: unknown): value is RedditSort {
   return typeof value === "string" && REDDIT_SORTS.includes(value as RedditSort);
@@ -7,6 +7,14 @@ export function isRedditSort(value: unknown): value is RedditSort {
 
 export function normalizeRedditSort(value: unknown): RedditSort {
   return isRedditSort(value) ? value : "hot";
+}
+
+export function isRedditSearchSort(value: unknown): value is RedditSearchSort {
+  return typeof value === "string" && REDDIT_SEARCH_SORTS.includes(value as RedditSearchSort);
+}
+
+export function normalizeRedditSearchSort(value: unknown): RedditSearchSort {
+  return isRedditSearchSort(value) ? value : "relevance";
 }
 
 export function isRedditTimeRange(value: unknown): value is RedditTimeRange {

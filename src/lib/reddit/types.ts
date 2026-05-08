@@ -1,6 +1,8 @@
-import type { REDDIT_SORTS, REDDIT_TIME_RANGES } from "./constants";
+import type { REDDIT_SEARCH_SORTS, REDDIT_SORTS, REDDIT_TIME_RANGES } from "./constants";
 
 export type RedditSort = (typeof REDDIT_SORTS)[number];
+
+export type RedditSearchSort = (typeof REDDIT_SEARCH_SORTS)[number];
 
 export type RedditTimeRange = (typeof REDDIT_TIME_RANGES)[number];
 
@@ -73,7 +75,7 @@ export type SortMode = RedditSort;
 
 export type RedditListing = {
   subreddit: string;
-  sort: RedditSort;
+  sort: RedditSort | RedditSearchSort;
   after: string | null;
   before: string | null;
   count: number;
@@ -84,6 +86,9 @@ export type RedditListing = {
 export type RedditListingRequest = {
   subreddit?: string;
   sort?: RedditSort | string;
+  query?: string;
+  restrictToSubreddit?: boolean;
+  searchSort?: RedditSearchSort | string;
   after?: string | null;
   count?: number;
   limit?: number;

@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { buildRedditListingUrl, normalizeRedditSort, normalizeRedditTimeRange, normalizeSubreddit } from "@/lib/reddit";
+import {
+  buildRedditListingUrl,
+  normalizeRedditSearchSort,
+  normalizeRedditSort,
+  normalizeRedditTimeRange,
+  normalizeSubreddit,
+} from "@/lib/reddit";
 import { readErrorMessage } from "@/lib/reddit/errors";
 import { fetchServerRedditResponse } from "@/lib/reddit/server";
 
@@ -8,7 +14,9 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const subreddit = normalizeSubreddit(url.searchParams.get("subreddit"));
+  const query = url.searchParams.get("q")?.trim() ?? "";
   const sort = normalizeRedditSort(url.searchParams.get("sort"));
+  const searchSort = normalizeRedditSearchSort(url.searchParams.get("sort"));
   const timeRange = normalizeRedditTimeRange(url.searchParams.get("t"));
   const after = url.searchParams.get("after");
   const count = Number(url.searchParams.get("count"));
@@ -16,6 +24,9 @@ export async function GET(request: Request) {
   const redditUrl = buildRedditListingUrl({
     subreddit,
     sort,
+    query,
+    restrictToSubreddit: url.searchParams.get("restrict_sr") === "on",
+    searchSort,
     timeRange,
     after,
     count: Number.isFinite(count) ? count : undefined,

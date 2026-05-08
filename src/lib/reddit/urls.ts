@@ -1,9 +1,19 @@
 import { REDDIT_ORIGIN } from "./constants";
-import { normalizeRedditSort, normalizeRedditTimeRange, normalizeSubreddit } from "./normalize";
+import { normalizeRedditSearchSort, normalizeRedditSort, normalizeRedditTimeRange, normalizeSubreddit } from "./normalize";
 import type { RedditListingRequest } from "./types";
 
 export function buildRedditListingUrl(request: RedditListingRequest = {}): string {
   const subreddit = normalizeSubreddit(request.subreddit);
+  const query = normalizeSearchQuery(request.query);
+
+  if (query) {
+    const url = new URL(`/r/${encodeURIComponent(subreddit)}/search.json`, REDDIT_ORIGIN);
+    applySearchParams(url, request, query);
+    applyListingParams(url, request);
+    url.searchParams.set("raw_json", "1");
+    return url.toString();
+  }
+
   const sort = normalizeRedditSort(request.sort);
   const pathname =
     sort === "hot"
@@ -23,6 +33,15 @@ export function buildRedditListingUrl(request: RedditListingRequest = {}): strin
 
 export function buildRedditProxyUrl(request: RedditListingRequest = {}): string {
   const url = new URL("/api/reddit", "http://localhost");
+  const query = normalizeSearchQuery(request.query);
+
+  if (query) {
+    url.searchParams.set("subreddit", normalizeSubreddit(request.subreddit));
+    applySearchParams(url, request, query);
+    applyListingParams(url, request);
+    return `${url.pathname}${url.search}`;
+  }
+
   const sort = normalizeRedditSort(request.sort);
 
   url.searchParams.set("subreddit", normalizeSubreddit(request.subreddit));
@@ -34,6 +53,15 @@ export function buildRedditProxyUrl(request: RedditListingRequest = {}): string 
 
   applyListingParams(url, request);
   return `${url.pathname}${url.search}`;
+}
+
+function applySearchParams(url: URL, request: RedditListingRequest, query: string) {
+  url.searchParams.set("q", query);
+  url.searchParams.set("sort", normalizeRedditSearchSort(request.searchSort));
+
+  if (request.restrictToSubreddit) {
+    url.searchParams.set("restrict_sr", "on");
+  }
 }
 
 function applyListingParams(url: URL, request: RedditListingRequest) {
@@ -51,4 +79,8 @@ function applyListingParams(url: URL, request: RedditListingRequest) {
       Math.min(100, Math.max(1, Math.trunc(request.limit))).toString(),
     );
   }
+}
+
+function normalizeSearchQuery(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
 }

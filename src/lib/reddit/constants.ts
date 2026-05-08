@@ -16,6 +16,13 @@ export const REDDIT_TIME_RANGES = [
   "all",
 ] as const;
 
+export const REDDIT_SEARCH_SORTS = [
+  "relevance",
+  "top",
+  "new",
+  "comments",
+] as const;
+
 export const REDDIT_ORIGIN = "https://www.reddit.com";
 export const DEFAULT_SUBREDDIT = "all";
 export const DEFAULT_LINK_THUMBNAIL = "/assets/default-link-thumbnail.png";
