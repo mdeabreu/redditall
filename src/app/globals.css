@@ -2501,7 +2501,8 @@ button {
 }
 
 .ar-post-badge,
-.ar-stickied-badge {
+.ar-stickied-badge,
+.ar-spoiler-badge {
   width: max-content;
   min-height: 24px;
   display: inline-flex;
@@ -2520,8 +2521,14 @@ button {
   color: #c2410c;
 }
 
+.ar-spoiler-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .ar-post-badge svg,
-.ar-stickied-badge svg {
+.ar-stickied-badge svg,
+.ar-spoiler-badge svg {
   width: 14px;
   height: 14px;
 }
@@ -2676,6 +2683,80 @@ button {
 .ar-post-card-video .ar-video-empty {
   min-height: 220px;
   height: auto;
+}
+
+.ar-spoiler-cover {
+  display: grid;
+  place-items: center;
+  min-height: 96px;
+  background: var(--surface-3);
+  color: var(--text-2);
+}
+
+.ar-spoiler-cover-media {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background: #111827;
+}
+
+.ar-spoiler-cover-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.ar-spoiler-cover-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.34);
+}
+
+.ar-spoiler-cover-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px;
+  color: white;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(17, 24, 39, 0.6);
+}
+
+.ar-spoiler-cover-text {
+  justify-items: start;
+  place-items: center start;
+  min-height: 0;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.ar-spoiler-reveal {
+  min-height: 34px;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 12px;
+  background: var(--blue-500);
+  color: white;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ar-spoiler-reveal:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
 .ar-flair {

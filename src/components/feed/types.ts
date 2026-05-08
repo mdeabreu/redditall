@@ -29,6 +29,7 @@ export type RedditPostCardData = {
   domain?: string;
   imageUrl?: string | null;
   image?: string | null;
+  obfuscatedImageUrl?: string | null;
   animatedImageUrl?: string | null;
   galleryImages?: string[];
   video?: string | null;
@@ -52,6 +53,9 @@ export type RedditPostCardData = {
   flairBackgroundColor?: string | null;
   flairTextColor?: string | null;
   over18?: boolean;
+  isSpoiler?: boolean;
+  spoiler?: boolean;
   isStickied?: boolean;
   stickied?: boolean;
+  selftext?: string;
 };

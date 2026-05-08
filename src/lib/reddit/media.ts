@@ -17,8 +17,33 @@ export function getBestImage(
   return validDirectImageUrl(asString(data.url_overridden_by_dest) || asString(data.url));
 }
 
+export function getObfuscatedImage(data: Record<string, unknown>): string | null {
+  const preview = data.preview;
+  if (!isRecord(preview) || !Array.isArray(preview.images)) {
+    return null;
+  }
+
+  const first = preview.images[0];
+  if (!isRecord(first) || !isRecord(first.variants)) {
+    return null;
+  }
+
+  const obfuscated = first.variants.obfuscated;
+  if (!isRecord(obfuscated) || !isRecord(obfuscated.source)) {
+    return null;
+  }
+
+  return validMediaUrl(asString(obfuscated.source.url));
+}
+
 export function getBestThumbnail(data: Record<string, unknown>): string | null {
-  return validMediaUrl(asString(data.thumbnail)) || getPreviewImage(data);
+  const thumbnail = asString(data.thumbnail);
+  const thumbnailUrl = validMediaUrl(thumbnail);
+  if (thumbnailUrl || thumbnail === "spoiler") {
+    return thumbnailUrl;
+  }
+
+  return getPreviewImage(data);
 }
 
 export function getAnimatedImageUrl(data: Record<string, unknown>): string | null {

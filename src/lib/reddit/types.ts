@@ -38,6 +38,7 @@ export type RedditPost = {
   thumbnail: string | null;
   image: string | null;
   imageUrl: string | null;
+  obfuscatedImageUrl: string | null;
   animatedImageUrl: string | null;
   galleryImages: string[];
   video: string | null;

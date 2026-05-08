@@ -8,6 +8,7 @@ import {
   getBestVideoMedia,
   getGalleryImages,
   getMediaKind,
+  getObfuscatedImage,
   getVideoPosterUrl,
   hasDefaultThumbnail,
 } from "./media";
@@ -48,6 +49,7 @@ export function normalizeRedditPost(child: unknown): RedditPost | null {
   const galleryImages = getGalleryImages(data);
   const animatedImageUrl = getAnimatedImageUrl(data);
   const image = animatedImageUrl || getBestImage(data, galleryImages);
+  const obfuscatedImageUrl = getObfuscatedImage(data);
   const thumbnail = getBestThumbnail(data);
   const videoMedia = getBestVideoMedia(data);
   const video = videoMedia.hlsUrl || videoMedia.fallbackVideoUrl || videoMedia.embedUrl;
@@ -88,6 +90,7 @@ export function normalizeRedditPost(child: unknown): RedditPost | null {
     thumbnail: thumbnail || (mediaKind === "link" && hasDefaultThumbnail(data) ? DEFAULT_LINK_THUMBNAIL : null),
     image,
     imageUrl: image,
+    obfuscatedImageUrl,
     animatedImageUrl,
     galleryImages,
     video,
