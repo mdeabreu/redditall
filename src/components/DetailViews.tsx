@@ -1,4 +1,6 @@
 import { ArrowLeft, ExternalLink, MessageSquare, Search, UserRound, X } from "@/components/FallbackIcon";
+import { useThemePreference } from "@/hooks/useThemePreference";
+import type { ThemePreference } from "@/lib/storage";
 import type { FeedPost } from "@/lib/reddit";
 import { useEffect, useState } from "react";
 
@@ -30,6 +32,7 @@ export function Drawer({
 }) {
   const [draftSearchQuery, setDraftSearchQuery] = useState(searchQuery);
   const [draftRestrictToSubreddit, setDraftRestrictToSubreddit] = useState(restrictToSubreddit);
+  const { themePreference, setThemePreference } = useThemePreference();
 
   useEffect(() => {
     setDraftSearchQuery(searchQuery);
@@ -89,6 +92,23 @@ export function Drawer({
             Search
           </button>
         </form>
+        <section className="ar-drawer-section" aria-labelledby="theme-control-heading">
+          <p className="ar-eyebrow" id="theme-control-heading">Appearance</p>
+          <div className="ar-theme-control" role="radiogroup" aria-label="Theme">
+            {themeOptions.map((option) => (
+              <button
+                key={option.value}
+                className={themePreference === option.value ? "active" : ""}
+                type="button"
+                role="radio"
+                aria-checked={themePreference === option.value}
+                onClick={() => setThemePreference(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </section>
         <div className="ar-drawer-list">
           {communities.map((name) => {
             const normalizedName = name.replace(/^\/?r\//i, "");
@@ -128,6 +148,12 @@ export function Drawer({
     </aside>
   );
 }
+
+const themeOptions: Array<{ label: string; value: ThemePreference }> = [
+  { label: "System", value: "system" },
+  { label: "Light", value: "light" },
+  { label: "Dark", value: "dark" },
+];
 
 export function ProfileView({ post, onClose }: PanelProps) {
   return (
