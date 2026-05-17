@@ -12,15 +12,19 @@ export type FeedPrefs = {
   recentSubreddits: string[];
 };
 
+export type ThemePreference = "system" | "light" | "dark";
+
 const SELECTED_SUBREDDIT_KEY = "redditall:selected-subreddit";
 const RECENT_SUBREDDITS_KEY = "redditall:recent-subreddits";
 const SORT_KEY = "redditall:sort";
+const THEME_KEY = "redditall:theme";
 const LEGACY_SELECTED_SUBREDDIT_KEY = "reddit-frontend:selected-subreddit";
 const LEGACY_RECENT_SUBREDDITS_KEY = "reddit-frontend:recent-subreddits";
 const LEGACY_SORT_KEY = "reddit-frontend:sort";
 const DEFAULT_SELECTED_SUBREDDIT = "all";
 const DEFAULT_RECENT_SUBREDDITS = [DEFAULT_SELECTED_SUBREDDIT];
 const MAX_RECENT_SUBREDDITS = 12;
+const THEME_PREFERENCES = ["system", "light", "dark"] as const;
 
 export function getSelectedSubreddit(fallback = DEFAULT_SELECTED_SUBREDDIT): string {
   const value = readStorageWithLegacy(SELECTED_SUBREDDIT_KEY, LEGACY_SELECTED_SUBREDDIT_KEY);
@@ -58,6 +62,20 @@ export function getSelectedSort(fallback: RedditSort = "hot"): RedditSort {
 export function setSelectedSort(sort: RedditSort | string): RedditSort {
   const normalized = normalizeRedditSort(sort);
   writeStorage(SORT_KEY, normalized);
+  return normalized;
+}
+
+export function normalizeThemePreference(value: string | null | undefined): ThemePreference {
+  return THEME_PREFERENCES.includes(value as ThemePreference) ? (value as ThemePreference) : "system";
+}
+
+export function getThemePreference(fallback: ThemePreference = "system"): ThemePreference {
+  return normalizeThemePreference(readStorage(THEME_KEY) ?? fallback);
+}
+
+export function setThemePreference(preference: ThemePreference | string): ThemePreference {
+  const normalized = normalizeThemePreference(preference);
+  writeStorage(THEME_KEY, normalized);
   return normalized;
 }
 
@@ -113,6 +131,7 @@ export function clearRedditPreferences(): void {
   removeStorage(SELECTED_SUBREDDIT_KEY);
   removeStorage(RECENT_SUBREDDITS_KEY);
   removeStorage(SORT_KEY);
+  removeStorage(THEME_KEY);
   removeStorage(LEGACY_SELECTED_SUBREDDIT_KEY);
   removeStorage(LEGACY_RECENT_SUBREDDITS_KEY);
   removeStorage(LEGACY_SORT_KEY);
