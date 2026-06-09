@@ -32,7 +32,7 @@ const payload = {
   },
 };
 
-test("browser listings use direct Reddit fetch when CORS works", async () => {
+test("browser listings use the proxy immediately", async () => {
   const restore = installBrowserGlobals();
   const calls: string[] = [];
   globalThis.fetch = async (url) => {
@@ -46,93 +46,40 @@ test("browser listings use direct Reddit fetch when CORS works", async () => {
     assert.equal(listing.posts.length, 1);
     assert.equal(listing.posts[0]?.title, "A good post");
     assert.equal(calls.length, 1);
-    assert.match(calls[0] ?? "", /^https:\/\/www\.reddit\.com\/r\/gifs\.json/);
+    assert.equal(calls[0], "/api/reddit?subreddit=gifs&sort=hot&limit=1");
   } finally {
     restore();
   }
 });
 
-test("browser listings fall back to Reddit JSONP before the proxy", async () => {
-  const restore = installBrowserGlobals(({ callbackName }) => {
-    const callback = (globalThis.window as unknown as Record<string, unknown>)[callbackName];
-    assert.equal(typeof callback, "function");
-    (callback as (payload: unknown) => void)(payload);
-  });
+test("browser listings do not attempt direct Reddit when proxy fails", async () => {
+  const restore = installBrowserGlobals();
   const calls: string[] = [];
   globalThis.fetch = async (url) => {
     calls.push(String(url));
-    throw new TypeError("CORS failed");
+    return new Response("Nope", { status: 502, statusText: "Bad Gateway" });
   };
 
   try {
-    const listing = await fetchRedditListing({ limit: 1, subreddit: "gifs" });
-
-    assert.equal(listing.posts.length, 1);
+    await assert.rejects(
+      () => fetchRedditListing({ limit: 1, subreddit: "gifs" }),
+      /Reddit request failed with 502 Bad Gateway/,
+    );
     assert.equal(calls.length, 1);
-    assert.match(calls[0] ?? "", /^https:\/\/www\.reddit\.com\/r\/gifs\.json/);
+    assert.equal(calls[0], "/api/reddit?subreddit=gifs&sort=hot&limit=1");
   } finally {
     restore();
   }
 });
 
-test("browser listings use the proxy only after direct and JSONP fail", async () => {
-  const restore = installBrowserGlobals(({ script }) => {
-    script.onerror?.(new Event("error"));
-  });
-  const calls: string[] = [];
-  globalThis.fetch = async (url) => {
-    calls.push(String(url));
-
-    if (calls.length === 1) {
-      throw new TypeError("CORS failed");
-    }
-
-    return Response.json(payload);
-  };
-
-  try {
-    const listing = await fetchRedditListing({ limit: 1, subreddit: "gifs" });
-
-    assert.equal(listing.posts.length, 1);
-    assert.equal(calls.length, 2);
-    assert.match(calls[0] ?? "", /^https:\/\/www\.reddit\.com\/r\/gifs\.json/);
-    assert.match(calls[1] ?? "", /^\/api\/reddit\?subreddit=gifs&sort=hot&limit=1/);
-  } finally {
-    restore();
-  }
-});
-
-type ScriptStub = {
-  onerror?: ((event: Event) => void) | null;
-  remove: () => void;
-  src: string;
-};
-
-function installBrowserGlobals(
-  onAppend?: (input: { callbackName: string; script: ScriptStub }) => void,
-) {
+function installBrowserGlobals() {
   const previousWindow = globalThis.window;
-  const previousDocument = globalThis.document;
   const previousFetch = globalThis.fetch;
 
   globalThis.window = globalThis as typeof globalThis & Window;
-  globalThis.document = {
-    createElement: () => ({
-      onerror: null,
-      remove: () => undefined,
-      src: "",
-    }),
-    head: {
-      append: (script: ScriptStub) => {
-        const callbackName = new URL(script.src).searchParams.get("jsonp") ?? "";
-        onAppend?.({ callbackName, script });
-      },
-    },
-  } as unknown as Document;
 
   return () => {
     globalThis.window = previousWindow;
-    globalThis.document = previousDocument;
     globalThis.fetch = previousFetch;
   };
 }

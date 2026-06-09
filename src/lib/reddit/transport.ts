@@ -1,12 +1,6 @@
 import { createRedditNetworkError, isAbortError } from "./errors";
-import { fetchRedditJsonp } from "./jsonp";
 
-export type RedditFetchSource = "cors" | "jsonp" | "proxy" | "server";
-
-export type RedditPayloadResult = {
-  payload: unknown;
-  source: RedditFetchSource;
-};
+export type RedditFetchSource = "proxy" | "server";
 
 export type RedditResponseResult = {
   response: Response;
@@ -45,30 +39,4 @@ export async function fetchJson(
 
     throw createRedditNetworkError(error, source);
   }
-}
-
-export async function fetchBrowserRedditPayload(
-  directUrl: string,
-  signal?: AbortSignal,
-): Promise<RedditPayloadResult | null> {
-  try {
-    const { response } = await fetchJson(directUrl, { signal, source: "cors" });
-    if (response.ok) {
-      return { payload: await response.json(), source: "cors" };
-    }
-  } catch (error) {
-    if (isAbortError(error)) {
-      throw error;
-    }
-  }
-
-  try {
-    return { payload: await fetchRedditJsonp(directUrl, signal), source: "jsonp" };
-  } catch (error) {
-    if (isAbortError(error)) {
-      throw error;
-    }
-  }
-
-  return null;
 }

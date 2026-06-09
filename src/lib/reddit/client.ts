@@ -1,7 +1,7 @@
 import { createRedditHttpError } from "./errors";
 import { parseRedditListing } from "./listing";
 import { normalizeRedditSearchSort, normalizeRedditSort, normalizeSubreddit } from "./normalize";
-import { fetchBrowserRedditPayload, fetchJson } from "./transport";
+import { fetchJson } from "./transport";
 import type { RedditListing, RedditListingRequest } from "./types";
 import { buildRedditListingUrl, buildRedditProxyUrl } from "./urls";
 
@@ -13,17 +13,11 @@ export async function fetchRedditListing(
   const query = typeof request.query === "string" ? request.query.trim() : "";
   const searchSort = normalizeRedditSearchSort(request.searchSort);
   const normalizedRequest = { ...request, subreddit, sort, query, searchSort };
-  const directUrl = buildRedditListingUrl(normalizedRequest);
-  const directPayload = typeof window === "undefined"
-    ? null
-    : await fetchBrowserRedditPayload(directUrl, request.signal);
-
-  if (directPayload !== null) {
-    return parseRedditListing(directPayload.payload, { subreddit, sort, query, searchSort });
-  }
-
   const { response, source } = typeof window === "undefined"
-    ? await fetchJson(directUrl, { signal: request.signal, source: "server" })
+    ? {
+        response: await fetchServerRedditListing(buildRedditListingUrl(normalizedRequest), request.signal),
+        source: "server" as const,
+      }
     : await fetchJson(buildRedditProxyUrl(normalizedRequest), { signal: request.signal, source: "proxy" });
 
   if (!response.ok) {
@@ -35,6 +29,11 @@ export async function fetchRedditListing(
   }
 
   return parseRedditListing(await response.json(), { subreddit, sort, query, searchSort });
+}
+
+async function fetchServerRedditListing(redditUrl: string, signal?: AbortSignal): Promise<Response> {
+  const { fetchServerRedditResponse } = await import("./server");
+  return fetchServerRedditResponse(redditUrl, signal);
 }
 
 export async function fetchSubredditPage(

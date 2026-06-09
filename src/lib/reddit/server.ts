@@ -1,32 +1,60 @@
-import { fetchJson } from "./transport";
+const REDDIT_BOOTSTRAP_URL = "https://old.reddit.com";
 
 const SERVER_REDDIT_HEADERS = {
-  "Accept-Language": "en-US,en;q=0.9",
-  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 ReddItAll/0.1",
+  Accept: "application/json,text/plain;q=0.9,*/*;q=0.8",
 };
 
-export async function fetchServerRedditResponse(redditUrl: string): Promise<Response> {
-  const { response } = await fetchJson(redditUrl, {
+type HeadersWithSetCookie = Headers & {
+  getSetCookie?: () => string[];
+};
+
+export async function fetchServerRedditResponse(
+  redditUrl: string,
+  signal?: AbortSignal,
+): Promise<Response> {
+  const cookieHeader = await fetchRedditBootstrapCookies(signal);
+
+  return fetch(redditUrl, {
     cache: "no-store",
-    headers: SERVER_REDDIT_HEADERS,
-    source: "server",
+    headers: {
+      ...SERVER_REDDIT_HEADERS,
+      Cookie: cookieHeader,
+    },
+    signal,
   });
+}
 
-  if (response.status !== 403) {
-    return response;
-  }
-
-  const oldRedditUrl = new URL(redditUrl);
-  oldRedditUrl.hostname = "old.reddit.com";
+async function fetchRedditBootstrapCookies(signal?: AbortSignal): Promise<string> {
+  let response: Response;
 
   try {
-    const retry = await fetchJson(oldRedditUrl.toString(), {
+    response = await fetch(REDDIT_BOOTSTRAP_URL, {
       cache: "no-store",
-      headers: SERVER_REDDIT_HEADERS,
-      source: "server",
+      signal,
     });
-    return retry.response;
-  } catch {
-    return response;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "Unknown network error";
+    throw new Error(`Reddit bootstrap request failed: ${detail}`);
   }
+
+  if (!response.ok) {
+    throw new Error(`Reddit bootstrap request failed with ${response.status} ${response.statusText}`);
+  }
+
+  const cookieHeader = extractCookieHeader(response.headers);
+
+  if (!cookieHeader) {
+    throw new Error("Reddit bootstrap request returned no cookies.");
+  }
+
+  return cookieHeader;
+}
+
+function extractCookieHeader(headers: Headers): string {
+  const setCookies = (headers as HeadersWithSetCookie).getSetCookie?.() ?? [];
+
+  return setCookies
+    .map((cookie) => cookie.split(";")[0]?.trim() ?? "")
+    .filter(Boolean)
+    .join("; ");
 }
