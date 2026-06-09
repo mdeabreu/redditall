@@ -6,6 +6,10 @@
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start -H 0.0.0.0",
+    "docker:build": "docker build -t ${DOCKER_IMAGE:-redditall:latest} .",
+    "docker:run": "docker run --rm -p ${PORT:-3000}:3000 ${DOCKER_IMAGE:-redditall:latest}",
+    "docker:run:env": "docker run --rm -p ${PORT:-3000}:3000 --env-file ${ENV_FILE:-.env.local} ${DOCKER_IMAGE:-redditall:latest}",
+    "docker:push": "docker push ${DOCKER_IMAGE:-redditall:latest}",
     "test": "tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",
     "typecheck": "tsc --noEmit"
   },
